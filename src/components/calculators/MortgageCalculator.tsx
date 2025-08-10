@@ -264,7 +264,7 @@ export default function MortgageCalculator() {
         </>
       )}
 
-      {hasResults && (
+      {hasValidInputs && (
         <Card className="border-accent">
           <CardHeader>
             <CardTitle className="text-accent flex items-center gap-2">
