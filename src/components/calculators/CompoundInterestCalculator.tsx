@@ -41,7 +41,8 @@ export default function CompoundInterestCalculator() {
   const [results, setResults] = useState({
     finalAmount: 0,
     totalInterest: 0,
-    totalDeposits: 0
+    totalDeposits: 0,
+    totalReturnPercentage: 0
   })
 
   const [chartData, setChartData] = useState<Array<{year: number, principal: number, interest: number}>>([])
@@ -73,11 +74,13 @@ export default function CompoundInterestCalculator() {
       }
 
       const totalInterest = finalAmount - totalDeposits
+      const totalReturnPercentage = totalDeposits > 0 ? ((finalAmount - totalDeposits) / totalDeposits) * 100 : 0
 
       setResults({
         finalAmount,
         totalInterest,
-        totalDeposits
+        totalDeposits,
+        totalReturnPercentage
       })
 
       const data = []
@@ -112,7 +115,8 @@ export default function CompoundInterestCalculator() {
       setResults({
         finalAmount: 0,
         totalInterest: 0,
-        totalDeposits: 0
+        totalDeposits: 0,
+        totalReturnPercentage: 0
       })
       setChartData([])
     }
@@ -215,6 +219,10 @@ export default function CompoundInterestCalculator() {
                 <div className="space-y-2">
                   <div className="text-sm text-muted-foreground">Total Deposits</div>
                   <div className="text-xl font-semibold text-warning">{formatCurrency(results.totalDeposits)}</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground">Total Return</div>
+                  <div className="text-xl font-semibold text-info">{results.totalReturnPercentage.toFixed(2)}%</div>
                 </div>
               </CardContent>
             </Card>
