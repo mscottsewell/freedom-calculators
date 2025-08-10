@@ -13,7 +13,7 @@ import fhuLogo from '@/assets/images/FHU_COB.jpg'
 const calculators = [
   {
     id: 'inflation',
-    title: 'Inflation Calculator',
+    title: 'Inflation',
     icon: TrendUp,
     component: InflationCalculator
   },
