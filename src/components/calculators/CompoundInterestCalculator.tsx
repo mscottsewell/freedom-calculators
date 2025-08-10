@@ -1,0 +1,263 @@
+import { useState, useEffect } from 'react'
+import { useKV } from '@github/spark/hooks'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount)
+}
+
+const compoundingFrequencies = [
+  { value: '1', label: 'Annually' },
+  { value: '2', label: 'Semi-annually' },
+  { value: '4', label: 'Quarterly' },
+  { value: '12', label: 'Monthly' },
+  { value: '52', label: 'Weekly' },
+  { value: '365', label: 'Daily' }
+]
+
+const depositFrequencies = [
+  { value: '0', label: 'None' },
+  { value: '12', label: 'Monthly' },
+  { value: '1', label: 'Annual' }
+]
+
+export default function CompoundInterestCalculator() {
+  const [principal, setPrincipal] = useKV('compound-principal', '')
+  const [interestRate, setInterestRate] = useKV('compound-rate', '')
+  const [years, setYears] = useKV('compound-years', '')
+  const [compoundingFreq, setCompoundingFreq] = useKV('compound-frequency', '12')
+  const [additionalDeposit, setAdditionalDeposit] = useKV('compound-deposit', '')
+  const [depositFreq, setDepositFreq] = useKV('compound-deposit-freq', '0')
+
+  const [results, setResults] = useState({
+    finalAmount: 0,
+    totalInterest: 0,
+    totalDeposits: 0
+  })
+
+  const [chartData, setChartData] = useState<Array<{year: number, principal: number, interest: number}>>([])
+
+  useEffect(() => {
+    const P = parseFloat(principal) || 0
+    const r = parseFloat(interestRate) / 100 || 0
+    const t = parseInt(years) || 0
+    const n = parseInt(compoundingFreq) || 12
+    const deposit = parseFloat(additionalDeposit) || 0
+    const depositFreqNum = parseInt(depositFreq) || 0
+
+    if (P > 0 && r >= 0 && t > 0) {
+      let finalAmount = P * Math.pow(1 + r / n, n * t)
+      let totalDeposits = P
+      
+      if (deposit > 0 && depositFreqNum > 0) {
+        const totalPayments = depositFreqNum * t
+        if (depositFreqNum === 12) {
+          const monthlyRate = r / 12
+          const futureValueAnnuity = deposit * ((Math.pow(1 + monthlyRate, 12 * t) - 1) / monthlyRate)
+          finalAmount += futureValueAnnuity
+        } else if (depositFreqNum === 1) {
+          const annualRate = r
+          const futureValueAnnuity = deposit * ((Math.pow(1 + annualRate, t) - 1) / annualRate)
+          finalAmount += futureValueAnnuity
+        }
+        totalDeposits += deposit * totalPayments
+      }
+
+      const totalInterest = finalAmount - totalDeposits
+
+      setResults({
+        finalAmount,
+        totalInterest,
+        totalDeposits
+      })
+
+      const data = []
+      for (let year = 0; year <= t; year++) {
+        let yearPrincipal = P * Math.pow(1 + r / n, n * year)
+        let yearDeposits = P
+        
+        if (deposit > 0 && depositFreqNum > 0 && year > 0) {
+          const paymentsThisYear = depositFreqNum * year
+          if (depositFreqNum === 12) {
+            const monthlyRate = r / 12
+            const futureValueAnnuity = deposit * ((Math.pow(1 + monthlyRate, 12 * year) - 1) / monthlyRate)
+            yearPrincipal += futureValueAnnuity
+          } else if (depositFreqNum === 1) {
+            const annualRate = r
+            const futureValueAnnuity = deposit * ((Math.pow(1 + annualRate, year) - 1) / annualRate)
+            yearPrincipal += futureValueAnnuity
+          }
+          yearDeposits += deposit * paymentsThisYear
+        }
+        
+        const yearInterest = yearPrincipal - yearDeposits
+        
+        data.push({
+          year,
+          principal: yearDeposits,
+          interest: yearInterest
+        })
+      }
+      setChartData(data)
+    } else {
+      setResults({
+        finalAmount: 0,
+        totalInterest: 0,
+        totalDeposits: 0
+      })
+      setChartData([])
+    }
+  }, [principal, interestRate, years, compoundingFreq, additionalDeposit, depositFreq])
+
+  const hasValidInputs = parseFloat(principal) > 0 && parseFloat(interestRate) >= 0 && parseInt(years) > 0
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="principal">Principal Amount ($)</Label>
+          <Input
+            id="principal"
+            type="number"
+            value={principal}
+            onChange={(e) => setPrincipal(e.target.value)}
+            placeholder="10000"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="interest-rate">Interest Rate (%)</Label>
+          <Input
+            id="interest-rate"
+            type="number"
+            step="0.1"
+            value={interestRate}
+            onChange={(e) => setInterestRate(e.target.value)}
+            placeholder="7.0"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="years">Years</Label>
+          <Input
+            id="years"
+            type="number"
+            value={years}
+            onChange={(e) => setYears(e.target.value)}
+            placeholder="10"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="compounding-freq">Compounding Frequency</Label>
+          <Select value={compoundingFreq} onValueChange={setCompoundingFreq}>
+            <SelectTrigger id="compounding-freq">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {compoundingFrequencies.map((freq) => (
+                <SelectItem key={freq.value} value={freq.value}>
+                  {freq.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="additional-deposit">Additional Deposit ($)</Label>
+          <Input
+            id="additional-deposit"
+            type="number"
+            value={additionalDeposit}
+            onChange={(e) => setAdditionalDeposit(e.target.value)}
+            placeholder="100"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="deposit-freq">Deposit Frequency</Label>
+          <Select value={depositFreq} onValueChange={setDepositFreq}>
+            <SelectTrigger id="deposit-freq">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {depositFrequencies.map((freq) => (
+                <SelectItem key={freq.value} value={freq.value}>
+                  {freq.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {hasValidInputs && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Results</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Final Amount</div>
+                <div className="text-2xl font-bold text-primary">{formatCurrency(results.finalAmount)}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Total Interest Earned</div>
+                <div className="text-xl font-semibold text-success">{formatCurrency(results.totalInterest)}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Total Deposits</div>
+                <div className="text-xl font-semibold text-warning">{formatCurrency(results.totalDeposits)}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-lg">Growth Over Time</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [
+                      formatCurrency(value), 
+                      name === 'principal' ? 'Principal' : 'Interest'
+                    ]}
+                    labelFormatter={(label) => `Year ${label}`}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="principal" 
+                    stackId="1"
+                    stroke="oklch(0.65 0.15 45)" 
+                    fill="oklch(0.65 0.15 45)"
+                    name="Principal"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="interest" 
+                    stackId="1"
+                    stroke="oklch(0.5 0.15 140)" 
+                    fill="oklch(0.5 0.15 140)"
+                    name="Interest"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+}
