@@ -259,6 +259,78 @@ export default function CompoundInterestCalculator() {
             </Card>
           </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <Card className="border-info">
+              <CardHeader>
+                <CardTitle className="text-info flex items-center gap-2">
+                  📐 Formula Used
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Compound Interest Formula:</h4>
+                  <div className="bg-muted p-3 rounded-lg font-mono text-sm">
+                    A = P(1 + r/n)^(nt)
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <div><strong>A</strong> = Final amount</div>
+                    <div><strong>P</strong> = Principal (initial investment)</div>
+                    <div><strong>r</strong> = Annual interest rate (decimal)</div>
+                    <div><strong>n</strong> = Compounding frequency per year</div>
+                    <div><strong>t</strong> = Time in years</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold mb-2">Additional Deposits Formula:</h4>
+                  <div className="bg-muted p-3 rounded-lg font-mono text-sm">
+                    FV = PMT × ((1 + r/n)^(nt) - 1) / (r/n)
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-2 space-y-1">
+                    <div><strong>FV</strong> = Future value of deposits</div>
+                    <div><strong>PMT</strong> = Regular deposit amount</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-warning">
+              <CardHeader>
+                <CardTitle className="text-warning flex items-center gap-2">
+                  ⚠️ Key Assumptions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>Interest rate remains constant throughout the investment period</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>Additional deposits are made at the end of each period</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>No withdrawals are made during the investment period</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>All interest is reinvested (compounded) automatically</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>No taxes or fees are considered in the calculation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-warning mt-0.5">•</span>
+                    <span>Market volatility and inflation are not factored in</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="border-accent mt-6">
             <CardHeader>
               <CardTitle className="text-accent flex items-center gap-2">
