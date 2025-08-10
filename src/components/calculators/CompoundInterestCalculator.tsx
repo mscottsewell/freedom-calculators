@@ -258,7 +258,7 @@ export default function CompoundInterestCalculator() {
           </Card>
         </div>
 
-        <Card className="border-accent">
+        <Card className="border-accent mt-6">
           <CardHeader>
             <CardTitle className="text-accent flex items-center gap-2">
               💡 Key Lesson
