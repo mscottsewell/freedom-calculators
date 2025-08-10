@@ -257,6 +257,22 @@ export default function CompoundInterestCalculator() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="border-accent">
+          <CardHeader>
+            <CardTitle className="text-accent flex items-center gap-2">
+              💡 Key Lesson
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground">
+              <strong>Compound interest is the eighth wonder of the world.</strong> The earlier you start investing, the more time your money has to grow exponentially. 
+              Even small amounts invested regularly can become substantial wealth over time due to compounding. The key is starting early and being consistent - 
+              time in the market is more powerful than timing the market. A 25-year-old who saves $200/month will have significantly more at retirement than 
+              a 35-year-old who saves $400/month, simply because of those extra 10 years of compound growth.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

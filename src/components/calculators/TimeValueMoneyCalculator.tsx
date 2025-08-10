@@ -247,6 +247,22 @@ export default function TimeValueMoneyCalculator() {
           It helps you calculate how much to save, based on a given interest rate, to meet future financial needs.
         </AlertDescription>
       </Alert>
+
+      <Card className="border-accent">
+        <CardHeader>
+          <CardTitle className="text-accent flex items-center gap-2">
+            💡 Key Lesson
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-foreground">
+            <strong>Time is your most valuable financial asset.</strong> The time value of money is the foundation of all personal finance decisions. 
+            Whether you're saving for retirement, a house, or any major purchase, understanding that money grows over time helps you make smarter choices. 
+            It explains why paying off high-interest debt quickly is crucial, why starting to save early is so powerful, and why delaying financial goals 
+            becomes increasingly expensive. Master this concept, and you'll understand why wealthy people often say "time is money."
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }

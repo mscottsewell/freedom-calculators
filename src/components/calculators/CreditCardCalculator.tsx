@@ -322,6 +322,24 @@ export default function CreditCardCalculator() {
           </Card>
         </>
       )}
+
+      {hasResults && (
+        <Card className="border-accent">
+          <CardHeader>
+            <CardTitle className="text-accent flex items-center gap-2">
+              💡 Key Lesson
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground">
+              <strong>Credit cards can be wealth destroyers if mismanaged.</strong> Making only minimum payments keeps you trapped in a cycle of debt, 
+              where most of your payment goes to interest rather than reducing the principal balance. High-interest debt is the opposite of compound interest - 
+              working against you instead of for you. Always pay more than the minimum, and prioritize paying off high-interest debt before investing. 
+              The "guaranteed return" from paying off an 18% credit card is better than most investment returns you'll find.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

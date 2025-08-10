@@ -175,6 +175,22 @@ export default function InflationCalculator() {
               in purchasing power due to inflation.
             </AlertDescription>
           </Alert>
+
+          <Card className="border-accent">
+            <CardHeader>
+              <CardTitle className="text-accent flex items-center gap-2">
+                💡 Key Lesson
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-foreground">
+                <strong>Inflation is the silent wealth killer.</strong> Even at modest rates like 3% annually, inflation significantly erodes your purchasing power over time. 
+                This is why keeping money in low-yield savings accounts or "under the mattress" actually causes you to lose money in real terms. 
+                To preserve and grow wealth, your investments must earn returns that exceed the inflation rate. Understanding inflation's impact 
+                is crucial for making informed decisions about saving, investing, and financial planning.
+              </p>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

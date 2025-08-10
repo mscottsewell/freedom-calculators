@@ -197,6 +197,23 @@ export default function AutoLoanCalculator() {
           </Card>
         </>
       )}
+
+      {hasResults && (
+        <Card className="border-accent">
+          <CardHeader>
+            <CardTitle className="text-accent flex items-center gap-2">
+              💡 Key Lesson
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground">
+              <strong>Cars are depreciating assets that require smart financing.</strong> Unlike a home that may appreciate, a car loses value the moment you drive it off the lot. 
+              This makes the interest rate and loan term crucial factors in your total cost. A longer loan term means lower monthly payments but significantly more interest paid over time. 
+              Consider the total cost of ownership, not just the monthly payment, and remember that reliable transportation is the goal - not impressing others with an expensive car payment.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
