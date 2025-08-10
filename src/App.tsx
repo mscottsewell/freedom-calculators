@@ -8,6 +8,7 @@ import TimeValueMoneyCalculator from '@/components/calculators/TimeValueMoneyCal
 import CreditCardCalculator from '@/components/calculators/CreditCardCalculator'
 import AutoLoanCalculator from '@/components/calculators/AutoLoanCalculator'
 import MortgageCalculator from '@/components/calculators/MortgageCalculator'
+import fhuLogo from '@/assets/images/FHU_COB.jpg'
 
 const calculators = [
   {
@@ -56,8 +57,8 @@ function App() {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mr-4">
-              <div className="text-primary-foreground text-2xl font-bold">FHU</div>
+            <div className="mr-4">
+              <img src={fhuLogo} alt="FHU College of Business" className="w-16 h-16 object-contain rounded-lg" />
             </div>
             <div className="text-center">
               <h1 className="text-3xl font-bold text-foreground mb-1">
