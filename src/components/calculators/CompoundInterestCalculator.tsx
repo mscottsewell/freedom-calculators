@@ -240,7 +240,7 @@ export default function CompoundInterestCalculator() {
                     <Tooltip 
                       formatter={(value: number, name: string) => [
                         formatCurrency(value), 
-                        name === 'principal' ? 'Principal' : 'Interest'
+                        name === 'principal' ? 'Principal: ' : 'Interest: '
                       ]}
                       labelFormatter={(label) => `Year ${label}`}
                     />
