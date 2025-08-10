@@ -33,11 +33,13 @@ interface PaymentDetail {
 }
 
 export default function MortgageCalculator() {
-  const [loanAmount, setLoanAmount] = useKV('mortgage-loan-amount', '')
+  const [homePrice, setHomePrice] = useKV('mortgage-home-price', '')
+  const [downPayment, setDownPayment] = useKV('mortgage-down-payment', '')
   const [interestRate, setInterestRate] = useKV('mortgage-interest-rate', '')
   const [loanTerm, setLoanTerm] = useKV('mortgage-loan-term', '')
 
   const [results, setResults] = useState({
+    loanAmount: 0,
     monthlyPayment: 0,
     totalInterest: 0,
     totalPaid: 0
@@ -47,7 +49,9 @@ export default function MortgageCalculator() {
   const [monthlySchedule, setMonthlySchedule] = useState<PaymentDetail[]>([])
 
   useEffect(() => {
-    const principal = parseFloat(loanAmount) || 0
+    const housePriceValue = parseFloat(homePrice) || 0
+    const downPaymentValue = parseFloat(downPayment) || 0
+    const principal = Math.max(0, housePriceValue - downPaymentValue)
     const annualRate = parseFloat(interestRate) / 100 || 0
     const years = parseInt(loanTerm) || 0
 
@@ -110,6 +114,7 @@ export default function MortgageCalculator() {
       }
 
       setResults({
+        loanAmount: principal,
         monthlyPayment,
         totalInterest: totalInterestPaid,
         totalPaid: principal + totalInterestPaid
@@ -119,6 +124,7 @@ export default function MortgageCalculator() {
       setMonthlySchedule(monthlyData)
     } else {
       setResults({
+        loanAmount: 0,
         monthlyPayment: 0,
         totalInterest: 0,
         totalPaid: 0
@@ -126,21 +132,33 @@ export default function MortgageCalculator() {
       setYearlySchedule([])
       setMonthlySchedule([])
     }
-  }, [loanAmount, interestRate, loanTerm])
+  }, [homePrice, downPayment, interestRate, loanTerm])
 
-  const hasValidInputs = parseFloat(loanAmount) > 0 && parseFloat(interestRate) >= 0 && parseInt(loanTerm) > 0
+  const hasValidInputs = parseFloat(homePrice) > 0 && parseFloat(downPayment) >= 0 && 
+                        parseFloat(homePrice) > parseFloat(downPayment || '0') && 
+                        parseFloat(interestRate) >= 0 && parseInt(loanTerm) > 0
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="loan-amount">Loan Amount ($)</Label>
+          <Label htmlFor="home-price">Home Price ($)</Label>
           <Input
-            id="loan-amount"
+            id="home-price"
             type="number"
-            value={loanAmount}
-            onChange={(e) => setLoanAmount(e.target.value)}
-            placeholder="300000"
+            value={homePrice}
+            onChange={(e) => setHomePrice(e.target.value)}
+            placeholder="350000"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="down-payment">Down Payment ($)</Label>
+          <Input
+            id="down-payment"
+            type="number"
+            value={downPayment}
+            onChange={(e) => setDownPayment(e.target.value)}
+            placeholder="50000"
           />
         </div>
         <div className="space-y-2">
@@ -173,7 +191,11 @@ export default function MortgageCalculator() {
               <CardTitle className="text-lg">Mortgage Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-secondary rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">Loan Amount</div>
+                  <div className="text-xl font-semibold text-info">{formatCurrency(results.loanAmount)}</div>
+                </div>
                 <div className="text-center p-4 bg-secondary rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1">Monthly Payment</div>
                   <div className="text-2xl font-bold text-primary">{formatCurrency(results.monthlyPayment)}</div>
