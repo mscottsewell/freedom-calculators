@@ -212,21 +212,21 @@ export default function CompoundInterestCalculator() {
                 <CardTitle className="text-lg">Results</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
+                <div className="flex justify-between items-center">
                   <div className="text-sm text-muted-foreground">Final Amount</div>
-                  <div className="text-2xl font-bold text-primary text-right">{formatCurrency(results.finalAmount)}</div>
+                  <div className="text-2xl font-bold text-primary">{formatCurrency(results.finalAmount)}</div>
                 </div>
-                <div className="space-y-2">
+                <div className="flex justify-between items-center">
                   <div className="text-sm text-muted-foreground">Total Interest Earned</div>
-                  <div className="text-xl font-semibold text-success text-right">{formatCurrency(results.totalInterest)}</div>
+                  <div className="text-xl font-semibold text-success">{formatCurrency(results.totalInterest)}</div>
                 </div>
-                <div className="space-y-2">
+                <div className="flex justify-between items-center">
                   <div className="text-sm text-muted-foreground">Total Deposits</div>
-                  <div className="text-xl font-semibold text-warning text-right">{formatCurrency(results.totalDeposits)}</div>
+                  <div className="text-xl font-semibold text-warning">{formatCurrency(results.totalDeposits)}</div>
                 </div>
-                <div className="space-y-2">
+                <div className="flex justify-between items-center">
                   <div className="text-sm text-muted-foreground">Total Return</div>
-                  <div className="text-xl font-semibold text-info text-right">{results.totalReturnPercentage.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</div>
+                  <div className="text-xl font-semibold text-info">{results.totalReturnPercentage.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</div>
                 </div>
               </CardContent>
             </Card>
