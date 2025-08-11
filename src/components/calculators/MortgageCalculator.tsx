@@ -259,18 +259,17 @@ export default function MortgageCalculator() {
               <CardHeader>
                 <CardTitle className="text-lg">Monthly Payment Breakdown</CardTitle>
               </CardHeader>
-              <CardContent>
                 <ScrollArea className="h-96 w-full">
                   <div className="pr-4">
+                        </TableRow>
                     <Table>
-                      <TableHeader>
                         <TableRow>
                           <TableHead className="w-20">Payment #</TableHead>
                           <TableHead className="text-right">Payment</TableHead>
                           <TableHead className="text-right">Principal</TableHead>
                           <TableHead className="text-right">Interest</TableHead>
                           <TableHead className="text-right">Balance</TableHead>
-                        </TableRow>
+                            <TableCell className="text-right">{formatCurrency(payment.balance)}</TableCell>
                       </TableHeader>
                       <TableBody>
                         {monthlySchedule.map((payment) => (
@@ -279,6 +278,7 @@ export default function MortgageCalculator() {
                             <TableCell className="text-right">{formatCurrency(payment.payment)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(payment.principal)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(payment.interest)}</TableCell>
+        </>
                             <TableCell className="text-right">{formatCurrency(payment.balance)}</TableCell>
                           </TableRow>
                         ))}
@@ -289,17 +289,6 @@ export default function MortgageCalculator() {
               </CardContent>
             </Card>
           </div>
-        </>
-      )}
-
-      {hasValidInputs && (
-        <Card className="border-accent">
-          <CardHeader>
-            <CardTitle className="text-accent flex items-center gap-2">
-              💡 Key Lesson
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
             <p className="text-foreground">
               <strong>Your home can be your largest investment or your biggest financial mistake.</strong> A mortgage allows you to leverage borrowed money to potentially build wealth through real estate appreciation. 
               However, the total interest paid over 30 years often equals or exceeds the original loan amount. Making extra principal payments early in the loan dramatically reduces total interest costs. 
