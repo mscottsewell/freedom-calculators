@@ -155,9 +155,9 @@ export default function AutoLoanCalculator() {
 
           <Alert>
             <AlertDescription>
-              <strong>Understanding Your Auto Loan:</strong> For a loan amount of {formatCurrency(parseFloat(loanAmount))} 
-              at {interestRate}% interest over {loanTerm} years, you'll pay {formatCurrency(results.monthlyPayment)} 
-              per month. Over the life of the loan, you'll pay {formatCurrency(results.totalInterest)} in interest, 
+              <strong>Understanding Your Auto Loan:</strong> For a loan amount of {formatCurrency(parseFloat(loanAmount))} at 
+              {interestRate}% interest over {loanTerm} years, you'll pay {formatCurrency(results.monthlyPayment)} per
+              month. Over the life of the loan, you'll pay {formatCurrency(results.totalInterest)} in interest, 
               making your total cost {formatCurrency(results.totalPaid)}.
             </AlertDescription>
           </Alert>

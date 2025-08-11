@@ -169,10 +169,10 @@ export default function InflationCalculator() {
 
           <Alert>
             <AlertDescription>
-              <strong>What This Means:</strong> With inflation at {inflationRate}% per year, your {formatCurrency(parseFloat(currentAmount))} 
-              today will only have the purchasing power of {formatCurrency(results.realValue)} in {years} years. 
-              You'll lose {formatCurrency(results.purchasingPowerLost)} ({formatNumber(results.percentageLost)}%) 
-              in purchasing power due to inflation.
+              <strong>What This Means:</strong> With inflation at {inflationRate}% per year, your {formatCurrency(parseFloat(currentAmount))} today
+              will only have the purchasing power of {formatCurrency(results.realValue)} in {years} years. 
+              You'll lose {formatCurrency(results.purchasingPowerLost)} ({formatNumber(results.percentageLost)}%) in
+              purchasing power due to inflation.
             </AlertDescription>
           </Alert>
 
