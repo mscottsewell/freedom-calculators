@@ -62,6 +62,9 @@ const calculators = [
   }
 ]
 
+// Centralized constant for nav icon size so it is easy to tweak later
+const NAV_ICON_SIZE = 64
+
 /**
  * Main App Component
  * 
@@ -112,9 +115,8 @@ function App() {
                   value={calc.id}
                   className="flex flex-col items-center gap-3 p-4 text-lg font-bold"
                 >
-                  {/* Calculator icon - larger and more prominent */}
-                  <IconComponent size={48} />
-                  {/* Calculator name - bold and larger text */}
+                  {/* Increased calculator icon size (was 48) */}
+                  <IconComponent size={NAV_ICON_SIZE} />
                   <span className="text-center leading-tight text-lg font-bold">{calc.title}</span>
                 </TabsTrigger>
               )
@@ -122,7 +124,7 @@ function App() {
           </TabsList>
 
           {/* Tab content - individual calculator components */}
-          {calculators.map((calc) => {
+            {calculators.map((calc) => {
             const Component = calc.component
             return (
               <TabsContent key={calc.id} value={calc.id} className="mt-0">
