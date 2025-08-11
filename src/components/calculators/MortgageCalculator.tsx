@@ -230,22 +230,22 @@ export default function MortgageCalculator() {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="w-16">Year</TableHead>
-                          <TableHead className="text-right">Begin Balance</TableHead>
                           <TableHead className="text-right">Payments</TableHead>
                           <TableHead className="text-right">Principal</TableHead>
                           <TableHead className="text-right">Interest</TableHead>
                           <TableHead className="text-right">End Balance</TableHead>
+                          <TableHead className="text-right">Total Equity</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {yearlySchedule.map((year) => (
                           <TableRow key={year.year}>
                             <TableCell>{year.year}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(year.beginningBalance)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(year.totalPayments)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(year.principalPaid)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(year.interestPaid)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(year.endingBalance)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(results.loanAmount - year.endingBalance)}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
