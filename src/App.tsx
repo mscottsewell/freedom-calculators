@@ -95,7 +95,7 @@ function App() {
               <h1 className="text-3xl font-bold text-foreground mb-1">
                 Mrs. Sewell's Financial FREEDom Calculators
               </h1>
-              <p className="text-muted-foreground text-lg">Personal Finance Made Easy</p>
+              <p className="text-muted-foreground text-xl">Personal Finance Made Easy!</p>
             </div>
           </div>
         </div>
