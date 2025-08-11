@@ -34,7 +34,7 @@ interface PaymentDetail {
 
 export default function MortgageCalculator() {
   const [homePrice, setHomePrice] = useKV('mortgage-home-price', '')
-  const [downPayment, setDownPayment] = useKV('mortgage-down-payment', '')
+  const [downPaymentPercent, setDownPaymentPercent] = useKV('mortgage-down-payment-percent', '10')
   const [interestRate, setInterestRate] = useKV('mortgage-interest-rate', '')
   const [loanTerm, setLoanTerm] = useKV('mortgage-loan-term', '')
 
@@ -50,8 +50,9 @@ export default function MortgageCalculator() {
 
   useEffect(() => {
     const housePriceValue = parseFloat(homePrice) || 0
-    const downPaymentValue = parseFloat(downPayment) || 0
-    const principal = Math.max(0, housePriceValue - downPaymentValue)
+    const downPaymentPercentValue = parseFloat(downPaymentPercent) || 0
+    const downPaymentAmount = housePriceValue * (downPaymentPercentValue / 100)
+    const principal = Math.max(0, housePriceValue - downPaymentAmount)
     const annualRate = parseFloat(interestRate) / 100 || 0
     const years = parseInt(loanTerm) || 0
 
@@ -132,10 +133,10 @@ export default function MortgageCalculator() {
       setYearlySchedule([])
       setMonthlySchedule([])
     }
-  }, [homePrice, downPayment, interestRate, loanTerm])
+  }, [homePrice, downPaymentPercent, interestRate, loanTerm])
 
-  const hasValidInputs = parseFloat(homePrice) > 0 && parseFloat(downPayment) >= 0 && 
-                        parseFloat(homePrice) > parseFloat(downPayment || '0') && 
+  const hasValidInputs = parseFloat(homePrice) > 0 && parseFloat(downPaymentPercent) >= 0 && 
+                        parseFloat(downPaymentPercent) < 100 && 
                         parseFloat(interestRate) >= 0 && parseInt(loanTerm) > 0
 
   return (
@@ -152,13 +153,14 @@ export default function MortgageCalculator() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="down-payment">Down Payment ($)</Label>
+          <Label htmlFor="down-payment">Down Payment (%)</Label>
           <Input
             id="down-payment"
             type="number"
-            value={downPayment}
-            onChange={(e) => setDownPayment(e.target.value)}
-            placeholder="50000"
+            step="0.1"
+            value={downPaymentPercent}
+            onChange={(e) => setDownPaymentPercent(e.target.value)}
+            placeholder="10"
           />
         </div>
         <div className="space-y-2">
@@ -191,7 +193,11 @@ export default function MortgageCalculator() {
               <CardTitle className="text-lg">Mortgage Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="text-center p-4 bg-secondary rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">Down Payment</div>
+                  <div className="text-xl font-semibold text-accent">{formatCurrency(parseFloat(homePrice) * (parseFloat(downPaymentPercent) || 0) / 100)}</div>
+                </div>
                 <div className="text-center p-4 bg-secondary rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1">Loan Amount</div>
                   <div className="text-xl font-semibold text-info">{formatCurrency(results.loanAmount)}</div>
