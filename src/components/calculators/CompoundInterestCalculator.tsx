@@ -17,11 +17,7 @@ const formatCurrency = (amount: number) => {
 
 const compoundingFrequencies = [
   { value: '1', label: 'Annually' },
-  { value: '2', label: 'Semi-annually' },
-  { value: '4', label: 'Quarterly' },
-  { value: '12', label: 'Monthly' },
-  { value: '52', label: 'Weekly' },
-  { value: '365', label: 'Daily' }
+  { value: '12', label: 'Monthly' }
 ]
 
 const depositFrequencies = [
