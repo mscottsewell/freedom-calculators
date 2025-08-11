@@ -113,7 +113,7 @@ function App() {
                   className="flex flex-col items-center gap-3 p-4 text-sm font-semibold"
                 >
                   {/* Calculator icon - larger and more prominent */}
-                  <IconComponent size={28} />
+                  <IconComponent size={32} />
                   {/* Calculator name - bold and larger text */}
                   <span className="text-center leading-tight font-bold">{calc.title}</span>
                 </TabsTrigger>
@@ -130,7 +130,7 @@ function App() {
                   {/* Card header with calculator icon and title */}
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <calc.icon size={24} />
+                      <calc.icon size={28} />
                       {calc.title}
                     </CardTitle>
                   </CardHeader>
