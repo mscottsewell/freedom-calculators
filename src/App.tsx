@@ -110,7 +110,7 @@ function App() {
                 <TabsTrigger
                   key={calc.id}
                   value={calc.id}
-                  className="flex flex-col items-center gap-3 p-4 text-lg font-semibold"
+                  className="flex flex-col items-center gap-3 p-4 text-lg font-bold"
                 >
                   {/* Calculator icon - larger and more prominent */}
                   <IconComponent size={48} />
