@@ -96,33 +96,40 @@ export default function CompoundInterestCalculator() {
 
     // Only calculate if we have valid inputs
     if (P > 0 && r >= 0 && t > 0) {
-      // Calculate principal with compound interest using: A = P(1 + r/n)^(nt)
+      // Step 1: Calculate compound growth of initial principal
+      // Uses the compound interest formula: A = P(1 + r/n)^(nt)
+      // Where: P = principal, r = annual rate, n = compounding frequency, t = time in years
       let finalAmount = P * Math.pow(1 + r / n, n * t)
-      let totalDeposits = P  // Start with initial principal
+      let totalDeposits = P  // Track total money invested (starts with initial principal)
       
-      // Calculate future value of additional deposits if specified
+      // Step 2: Calculate future value of additional deposits if specified
       if (deposit > 0 && depositFreqNum > 0) {
-        const totalPayments = depositFreqNum * t  // Total number of deposits
-        totalDeposits += deposit * totalPayments  // Add all deposits to total
+        const totalPayments = depositFreqNum * t  // Total number of additional deposits over time
+        totalDeposits += deposit * totalPayments  // Add all deposits to total invested
         
         // Calculate future value of each deposit based on when it's made
-        // Each deposit compounds for different periods depending on when made
+        // Each deposit compounds for a different amount of time
+        // Earlier deposits compound longer than later deposits
         let depositsFutureValue = 0
         
+        // Process each deposit individually to account for different compounding periods
         for (let period = 1; period <= totalPayments; period++) {
-          // Time remaining for this deposit to compound (in years)
+          // Calculate how long this deposit has to compound (in years)
+          // Period 1 deposit compounds for almost the full time
+          // Last period deposit compounds for almost no time
           const timeRemaining = t - (period / depositFreqNum)
-          // Future value of this single deposit
-          const thiDepositFV = deposit * Math.pow(1 + r / n, n * timeRemaining)
-          depositsFutureValue += thiDepositFV
+          
+          // Calculate future value of this single deposit using compound interest formula
+          const thisDepositFV = deposit * Math.pow(1 + r / n, n * timeRemaining)
+          depositsFutureValue += thisDepositFV
         }
         
-        // Add the future value of all deposits to final amount
+        // Add the future value of all deposits to the final amount
         finalAmount += depositsFutureValue
       }
 
-      // Calculate derived values
-      const totalInterest = finalAmount - totalDeposits
+      // Step 3: Calculate derived values for display
+      const totalInterest = finalAmount - totalDeposits  // Interest earned = Final - Invested
       const totalReturnPercentage = totalDeposits > 0 ? ((finalAmount - totalDeposits) / totalDeposits) * 100 : 0
 
       setResults({
@@ -132,19 +139,21 @@ export default function CompoundInterestCalculator() {
         totalReturnPercentage
       })
 
-      // Generate chart data showing growth year by year
+      // Step 4: Generate chart data showing growth progression year by year
+      // This creates data points for the area chart visualization
       const data = []
       for (let year = 0; year <= t; year++) {
-        // Calculate principal growth for this year
+        // Calculate how much the initial principal has grown by this year
         let yearAmount = P * Math.pow(1 + r / n, n * year)
-        let yearDeposits = P  // Start with initial principal
+        let yearDeposits = P  // Track total deposits made by this year
         
-        // Add deposits made up to this year
+        // Add deposits made up to this point in time
         if (deposit > 0 && depositFreqNum > 0 && year > 0) {
-          const paymentsThisYear = Math.floor(depositFreqNum * year)
+          const paymentsThisYear = Math.floor(depositFreqNum * year)  // Number of deposits made
           yearDeposits += deposit * paymentsThisYear
           
-          // Calculate future value of deposits made up to this year
+          // Calculate the future value of all deposits made up to this year
+          // Each deposit compounds from when it was made until this point
           let depositsFutureValue = 0
           for (let period = 1; period <= paymentsThisYear; period++) {
             const timeRemaining = year - (period / depositFreqNum)
@@ -156,12 +165,14 @@ export default function CompoundInterestCalculator() {
         }
         
         // Calculate interest portion for chart visualization
+        // Interest = Total Value - Money Actually Invested
         const yearInterest = yearAmount - yearDeposits
         
+        // Store data point for chart (creates the stacked area visualization)
         data.push({
           year,
-          principal: yearDeposits,    // Money put in (orange in chart)
-          interest: yearInterest      // Interest earned (green in chart)
+          principal: yearDeposits,    // Money put in (orange area in chart)
+          interest: yearInterest      // Interest earned (green area in chart)
         })
       }
       setChartData(data)

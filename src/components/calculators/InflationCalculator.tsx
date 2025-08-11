@@ -86,13 +86,20 @@ export default function InflationCalculator() {
 
     // Only calculate if we have valid positive inputs
     if (amount > 0 && rate >= 0 && numYears > 0) {
-      // Calculate future nominal value (what the number will be)
+      // Step 1: Calculate future nominal value (what the dollar amount will be)
+      // This shows what the number on paper will say, but not its actual buying power
+      // Formula: FV = PV × (1 + inflation_rate)^years
       const futureValue = amount * Math.pow(1 + rate, numYears)
       
-      // Calculate real purchasing power value (what it can actually buy)
+      // Step 2: Calculate real purchasing power value (what it can actually buy)
+      // This is the key calculation - it shows what today's amount will be worth
+      // in today's purchasing power after accounting for inflation
+      // Formula: Real Value = Present Value / (1 + inflation_rate)^years
+      // This is the "deflating" of future dollars back to today's buying power
       const realValue = amount / Math.pow(1 + rate, numYears)
       
-      // Calculate the loss in purchasing power
+      // Step 3: Calculate the loss in purchasing power
+      // This shows how much buying power is lost to inflation
       const purchasingPowerLost = amount - realValue
       const percentageLost = (purchasingPowerLost / amount) * 100
 
@@ -103,14 +110,17 @@ export default function InflationCalculator() {
         percentageLost
       })
 
-      // Generate chart data showing purchasing power decline year by year
+      // Step 4: Generate chart data showing purchasing power decline year by year
+      // This creates a visual representation of how inflation erodes value over time
       const data = []
       for (let year = 0; year <= numYears; year++) {
+        // Calculate purchasing power for each year
+        // Year 0 = full purchasing power, each subsequent year loses value
         const purchasingPower = amount / Math.pow(1 + rate, year)
         data.push({
           year,
-          purchasingPower,
-          originalValue: amount  // Reference line for comparison
+          purchasingPower,                    // Declining line (red area)
+          originalValue: amount               // Reference line showing original value (stays flat)
         })
       }
       setChartData(data)

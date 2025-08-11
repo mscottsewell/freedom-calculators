@@ -37,34 +37,70 @@ export default function AutoLoanCalculator() {
 
   const [amortizationSchedule, setAmortizationSchedule] = useState<PaymentDetail[]>([])
 
+  /**
+   * Effect to calculate auto loan payment and amortization schedule whenever inputs change
+   * 
+   * Auto loan calculations use the standard amortizing loan formula where:
+   * 1. Monthly payment is fixed for the entire loan term
+   * 2. Each payment contains both principal and interest portions
+   * 3. Early payments are mostly interest; later payments are mostly principal
+   * 4. The balance decreases to zero over the loan term
+   * 
+   * Mathematical Background:
+   * Monthly Payment Formula: PMT = P × [r(1+r)^n] / [(1+r)^n - 1]
+   * Where: P = Principal, r = monthly rate, n = number of payments
+   * 
+   * Educational Purpose:
+   * - Shows the true cost of financing a car purchase
+   * - Demonstrates how loan term affects monthly payment and total interest
+   * - Illustrates the amortization process and payment allocation
+   * - Helps students understand the trade-offs between payment amount and loan duration
+   */
   useEffect(() => {
-    const principal = parseFloat(loanAmount) || 0
-    const annualRate = parseFloat(interestRate) / 100 || 0
-    const years = parseInt(loanTerm) || 0
+    // Convert string inputs to numbers with fallbacks
+    const principal = parseFloat(loanAmount) || 0    // Total amount borrowed
+    const annualRate = parseFloat(interestRate) / 100 || 0  // Annual interest rate (as decimal)
+    const years = parseInt(loanTerm) || 0            // Loan term in years
 
+    // Only calculate if we have valid positive inputs
     if (principal > 0 && annualRate >= 0 && years > 0) {
-      const monthlyRate = annualRate / 12
-      const numberOfPayments = years * 12
+      const monthlyRate = annualRate / 12              // Convert annual rate to monthly
+      const numberOfPayments = years * 12             // Total number of monthly payments
 
       let monthlyPayment: number
       
+      // Handle special case of 0% interest (simple division)
       if (annualRate === 0) {
         monthlyPayment = principal / numberOfPayments
       } else {
-        monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
-          (Math.pow(1 + monthlyRate, numberOfPayments) - 1)
+        // Standard amortizing loan payment formula
+        // PMT = P × [r(1+r)^n] / [(1+r)^n - 1]
+        // This ensures the loan is fully paid off in exactly n payments
+        const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
+        const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
+        monthlyPayment = principal * (numerator / denominator)
       }
 
+      // Generate complete amortization schedule
       let remainingBalance = principal
       let totalInterestPaid = 0
       const schedule: PaymentDetail[] = []
 
+      // Calculate each payment's allocation between principal and interest
       for (let month = 1; month <= numberOfPayments; month++) {
+        // Interest portion: remaining balance × monthly rate
         const interestPayment = remainingBalance * monthlyRate
+        
+        // Principal portion: total payment - interest portion
         const principalPayment = monthlyPayment - interestPayment
+        
+        // Update remaining balance by subtracting principal payment
         remainingBalance = Math.max(0, remainingBalance - principalPayment)
+        
+        // Accumulate total interest paid over loan life
         totalInterestPaid += interestPayment
 
+        // Record this payment's details
         schedule.push({
           month,
           payment: monthlyPayment,
@@ -74,14 +110,16 @@ export default function AutoLoanCalculator() {
         })
       }
 
+      // Update results with calculated values
       setResults({
         monthlyPayment,
         totalInterest: totalInterestPaid,
-        totalPaid: principal + totalInterestPaid
+        totalPaid: principal + totalInterestPaid  // Original loan + all interest
       })
 
       setAmortizationSchedule(schedule)
     } else {
+      // Reset results if inputs are invalid
       setResults({
         monthlyPayment: 0,
         totalInterest: 0,

@@ -34,44 +34,88 @@ const formatNumber = (amount: number) => {
 }
 
 /**
- * Newton-Raphson method for finding interest rate
- * Advanced mathematical method for solving complex equations
+ * Newton-Raphson method for calculating interest rate in TVM problems
+ * 
+ * This is an iterative numerical method used to find the interest rate when other
+ * TVM variables are known. The method works by making successive approximations
+ * until it converges on the correct answer.
+ * 
+ * Mathematical Background:
+ * - Uses the derivative of the TVM equation to find the root (where equation equals zero)
+ * - Formula: f(r) = PV(1+r)^n + PMT[((1+r)^n - 1)/r] - FV = 0
+ * - Each iteration: r_new = r_old - f(r)/f'(r)
+ * 
+ * @param n - Number of compounding periods
+ * @param pv - Present value (amount invested/borrowed today)
+ * @param pmt - Payment amount per period (positive for payments received)
+ * @param fv - Future value (target amount)
+ * @returns Interest rate as percentage (e.g., 5.0 for 5%)
  */
 function calculateInterestRate(n: number, pv: number, pmt: number, fv: number): number {
-  let rate = 0.1 // Initial guess
-  const tolerance = 0.0000001
-  const maxIterations = 100
+  let rate = 0.1 // Initial guess at 10% - a reasonable starting point for most financial scenarios
+  const tolerance = 0.0000001 // Convergence threshold - stop when changes are smaller than this
+  const maxIterations = 100   // Prevent infinite loops in case convergence fails
 
   for (let i = 0; i < maxIterations; i++) {
+    // Calculate the TVM equation value at current rate guess
+    // f(r) represents how far we are from the target (should equal zero when solved)
     const f = pv * Math.pow(1 + rate, n) + pmt * ((Math.pow(1 + rate, n) - 1) / rate) - fv
+    
+    // Calculate the derivative of the TVM equation (slope at current point)
+    // This tells us which direction and how much to adjust our guess
     const df = n * pv * Math.pow(1 + rate, n - 1) + pmt * (n * Math.pow(1 + rate, n - 1) / rate - (Math.pow(1 + rate, n) - 1) / (rate * rate))
     
+    // Calculate the next approximation using Newton-Raphson formula
     const newRate = rate - f / df
     
+    // Check if we've converged (change is smaller than our tolerance)
     if (Math.abs(newRate - rate) < tolerance) {
-      return newRate * 100 // Convert to percentage
+      return newRate * 100 // Convert to percentage and return final answer
     }
     
+    // Update rate for next iteration
     rate = newRate
   }
   
+  // If we reach here, convergence failed - return current best guess
   return rate * 100
 }
 
-// Newton-Raphson method for finding number of periods
+/**
+ * Calculate the number of periods needed to reach a future value
+ * 
+ * This function determines how many payment periods (months, years, etc.) are needed
+ * to grow a present value to a target future value, given an interest rate and payment amount.
+ * 
+ * Mathematical Background:
+ * - For simple compound interest (no payments): n = ln(FV/PV) / ln(1+r)
+ * - For annuities (with payments): n = ln((FV*r + PMT)/(PV*r + PMT)) / ln(1+r)
+ * - Special case: when r=0, growth is linear: n = (FV - PV) / PMT
+ * 
+ * @param rate - Interest rate as percentage (e.g., 5 for 5%)
+ * @param pv - Present value (starting amount)
+ * @param pmt - Payment amount per period (0 if no payments)
+ * @param fv - Future value (target amount)
+ * @returns Number of periods needed to reach the future value
+ */
 function calculatePeriods(rate: number, pv: number, pmt: number, fv: number): number {
+  // Handle the special case where there's no interest rate (0%)
+  // In this case, growth is purely linear from payments
   if (rate === 0) {
     return (fv - pv) / pmt
   }
   
-  rate = rate / 100 // Convert from percentage
+  rate = rate / 100 // Convert from percentage to decimal (5% becomes 0.05)
   
-  // Use logarithmic formula for periods
+  // Case 1: No payments - simple compound interest formula
+  // Uses natural logarithm to solve: PV(1+r)^n = FV for n
   if (pmt === 0) {
     return Math.log(fv / pv) / Math.log(1 + rate)
   }
   
-  // With payments
+  // Case 2: With payments - annuity formula
+  // Solve: PV(1+r)^n + PMT[((1+r)^n - 1)/r] = FV for n
+  // Rearranged to: n = ln((FV*r + PMT)/(PV*r + PMT)) / ln(1+r)
   const numerator = Math.log((fv * rate + pmt) / (pv * rate + pmt))
   const denominator = Math.log(1 + rate)
   
@@ -88,54 +132,90 @@ export default function TimeValueMoneyCalculator() {
 
   const [result, setResult] = useState<number | null>(null)
 
+  /**
+   * Effect to recalculate the selected TVM variable whenever inputs change
+   * 
+   * Time Value of Money calculations use the fundamental equation:
+   * PV(1+r)^n + PMT[((1+r)^n - 1)/r] = FV
+   * 
+   * This equation can be rearranged to solve for any one variable when the others are known:
+   * - Present Value (PV): What amount today equals a future amount?
+   * - Future Value (FV): What will an amount grow to over time?
+   * - Payment (PMT): What regular payment is needed to reach a goal?
+   * - Periods (N): How long will it take to reach a financial goal?
+   * - Interest Rate (I): What return rate is needed to meet goals?
+   */
   useEffect(() => {
-    const n = parseFloat(periods) || 0
-    const rate = parseFloat(interestRate) / 100 || 0
-    const pv = parseFloat(presentValue) || 0
-    const pmt = parseFloat(payment) || 0
-    const fv = parseFloat(futureValue) || 0
+    // Convert string inputs to numbers with fallbacks
+    const n = parseFloat(periods) || 0          // Number of periods
+    const rate = parseFloat(interestRate) / 100 || 0  // Interest rate (as decimal)
+    const pv = parseFloat(presentValue) || 0    // Present value
+    const pmt = parseFloat(payment) || 0        // Payment amount
+    const fv = parseFloat(futureValue) || 0     // Future value
 
     let calculatedResult: number | null = null
 
     try {
       switch (calculateVariable) {
         case 'periods':
+          // Calculate number of periods needed to reach future value
+          // Requires: interest rate, present value or payment, and future value
           if (rate !== 0 && (pv !== 0 || pmt !== 0) && fv !== 0) {
             calculatedResult = calculatePeriods(parseFloat(interestRate), pv, pmt, fv)
           }
           break
+          
         case 'rate':
+          // Calculate required interest rate using Newton-Raphson method
+          // Requires: number of periods, present value or payment, and future value
           if (n > 0 && (pv !== 0 || pmt !== 0) && fv !== 0) {
             calculatedResult = calculateInterestRate(n, pv, pmt, fv)
           }
           break
+          
         case 'pv':
+          // Calculate present value (what amount today equals the future value)
+          // Formula: PV = (FV - PMT*annuity_factor) / (1+r)^n
           if (n > 0 && rate !== 0 && fv !== 0) {
             if (pmt === 0) {
+              // Simple present value: PV = FV / (1+r)^n
               calculatedResult = fv / Math.pow(1 + rate, n)
             } else {
-              calculatedResult = (fv - pmt * ((Math.pow(1 + rate, n) - 1) / rate)) / Math.pow(1 + rate, n)
+              // Present value with payments: subtract the present value of annuity payments
+              const annuityPV = pmt * ((Math.pow(1 + rate, n) - 1) / rate)
+              calculatedResult = (fv - annuityPV) / Math.pow(1 + rate, n)
             }
           }
           break
+          
         case 'pmt':
+          // Calculate required payment to reach future value from present value
+          // Formula: PMT = (FV - PV(1+r)^n) / [((1+r)^n - 1)/r]
           if (n > 0 && rate !== 0 && (pv !== 0 || fv !== 0)) {
-            const pvFactor = pv * Math.pow(1 + rate, n)
-            const annuityFactor = (Math.pow(1 + rate, n) - 1) / rate
+            const pvFactor = pv * Math.pow(1 + rate, n)     // Future value of present amount
+            const annuityFactor = (Math.pow(1 + rate, n) - 1) / rate  // Annuity factor
             calculatedResult = (fv - pvFactor) / annuityFactor
           }
           break
+          
         case 'fv':
+          // Calculate future value from present value and/or payments
+          // Formula: FV = PV(1+r)^n + PMT[((1+r)^n - 1)/r]
           if (n > 0 && rate >= 0) {
             if (rate === 0) {
+              // No interest: FV = PV + PMT * n (simple addition)
               calculatedResult = pv + pmt * n
             } else {
-              calculatedResult = pv * Math.pow(1 + rate, n) + pmt * ((Math.pow(1 + rate, n) - 1) / rate)
+              // With interest: compound present value + future value of annuity
+              const compoundedPV = pv * Math.pow(1 + rate, n)  // Future value of lump sum
+              const annuityFV = pmt * ((Math.pow(1 + rate, n) - 1) / rate)  // Future value of payments
+              calculatedResult = compoundedPV + annuityFV
             }
           }
           break
       }
     } catch (error) {
+      // Handle any mathematical errors (division by zero, invalid logarithms, etc.)
       calculatedResult = null
     }
 

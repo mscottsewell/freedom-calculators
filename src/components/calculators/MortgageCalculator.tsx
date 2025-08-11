@@ -94,38 +94,82 @@ export default function MortgageCalculator() {
   const [yearlySchedule, setYearlySchedule] = useState<YearlyData[]>([])
   const [monthlySchedule, setMonthlySchedule] = useState<PaymentDetail[]>([])
 
+  /**
+   * Effect to calculate mortgage payment and amortization schedules whenever inputs change
+   * 
+   * Mortgage calculations follow the same amortizing loan principles as auto loans but with
+   * additional complexity around home pricing and down payments. Key concepts:
+   * 
+   * 1. Loan Amount = Home Price - Down Payment
+   * 2. Down payment reduces the principal borrowed and affects monthly payments
+   * 3. Equity = Down Payment + Principal Paid + Home Appreciation
+   * 4. Longer terms (30 vs 15 years) reduce payments but increase total interest
+   * 
+   * Mathematical Background:
+   * - Uses the same PMT formula as auto loans: PMT = P × [r(1+r)^n] / [(1+r)^n - 1]
+   * - Loan-to-Value ratio = Loan Amount / Home Price
+   * - Total Equity = Home Value - Remaining Loan Balance
+   * 
+   * Educational Purpose:
+   * - Demonstrates the impact of down payments on monthly payments and total cost
+   * - Shows how much of early payments go to interest vs building equity
+   * - Illustrates the long-term commitment and cost of homeownership
+   * - Teaches the concept of building wealth through home equity
+   * - Reinforces the importance of understanding total borrowing costs
+   */
   useEffect(() => {
+    // Convert string inputs to numbers and calculate derived values
     const housePriceValue = parseFloat(homePrice) || 0
     const downPaymentPercentValue = parseFloat(downPaymentPercent) || 0
+    
+    // Calculate down payment amount from percentage
     const downPaymentAmount = housePriceValue * (downPaymentPercentValue / 100)
+    
+    // Calculate loan principal (amount borrowed after down payment)
     const principal = Math.max(0, housePriceValue - downPaymentAmount)
-    const annualRate = parseFloat(interestRate) / 100 || 0
-    const years = parseInt(loanTerm) || 0
+    
+    const annualRate = parseFloat(interestRate) / 100 || 0  // Convert percentage to decimal
+    const years = parseInt(loanTerm) || 0                   // Loan term in years
 
+    // Only calculate if we have valid inputs
     if (principal > 0 && annualRate >= 0 && years > 0) {
-      const monthlyRate = annualRate / 12
-      const numberOfPayments = years * 12
+      const monthlyRate = annualRate / 12               // Convert annual rate to monthly
+      const numberOfPayments = years * 12              // Total number of payments
 
       let monthlyPayment: number
       
+      // Handle special case of 0% interest (interest-free loan)
       if (annualRate === 0) {
         monthlyPayment = principal / numberOfPayments
       } else {
-        monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
-          (Math.pow(1 + monthlyRate, numberOfPayments) - 1)
+        // Standard amortizing mortgage payment formula
+        // This is the same formula used by banks and mortgage calculators
+        const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
+        const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
+        monthlyPayment = principal * (numerator / denominator)
       }
 
+      // Generate detailed payment schedules
       let remainingBalance = principal
       let totalInterestPaid = 0
       const monthlyData: PaymentDetail[] = []
       const yearlyData: YearlyData[] = []
 
+      // Calculate each monthly payment's allocation
       for (let month = 1; month <= numberOfPayments; month++) {
+        // Interest portion: remaining balance × monthly interest rate
         const interestPayment = remainingBalance * monthlyRate
+        
+        // Principal portion: fixed payment - interest (varies each month)
         const principalPayment = monthlyPayment - interestPayment
+        
+        // Update remaining loan balance
         remainingBalance = Math.max(0, remainingBalance - principalPayment)
+        
+        // Track cumulative interest paid
         totalInterestPaid += interestPayment
 
+        // Store monthly payment details
         monthlyData.push({
           month,
           payment: monthlyPayment,
@@ -134,15 +178,17 @@ export default function MortgageCalculator() {
           balance: remainingBalance
         })
 
-        // Aggregate by year
+        // Aggregate data by year for yearly summary table
         const currentYear = Math.ceil(month / 12)
         const isLastMonthOfYear = month % 12 === 0 || month === numberOfPayments
 
         if (isLastMonthOfYear) {
+          // Calculate year start and end boundaries
           const yearStart = (currentYear - 1) * 12 + 1
           const yearEnd = Math.min(currentYear * 12, numberOfPayments)
           const yearPayments = monthlyData.slice(yearStart - 1, yearEnd)
           
+          // Calculate yearly totals by summing monthly data
           const beginningBalance = yearStart === 1 ? principal : monthlyData[yearStart - 2].balance
           const totalPayments = yearPayments.reduce((sum, p) => sum + p.payment, 0)
           const principalPaid = yearPayments.reduce((sum, p) => sum + p.principal, 0)
@@ -160,16 +206,18 @@ export default function MortgageCalculator() {
         }
       }
 
+      // Update state with calculated results
       setResults({
         loanAmount: principal,
         monthlyPayment,
         totalInterest: totalInterestPaid,
-        totalPaid: principal + totalInterestPaid
+        totalPaid: principal + totalInterestPaid  // Total amount paid over loan life
       })
 
       setYearlySchedule(yearlyData)
       setMonthlySchedule(monthlyData)
     } else {
+      // Reset results if inputs are invalid
       setResults({
         loanAmount: 0,
         monthlyPayment: 0,

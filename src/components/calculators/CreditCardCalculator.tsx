@@ -42,64 +42,104 @@ export default function CreditCardCalculator() {
   const [paymentSchedule, setPaymentSchedule] = useState<PaymentDetail[]>([])
   const [chartData, setChartData] = useState<Array<{month: number, principal: number, interest: number}>>([])
 
+  /**
+   * Effect to calculate credit card payoff schedule whenever inputs change
+   * 
+   * Credit card calculations use iterative month-by-month simulations rather than
+   * closed-form formulas because payment structures are complex and variable.
+   * 
+   * Key Credit Card Payment Logic:
+   * 1. Interest is calculated monthly on the remaining balance
+   * 2. Minimum payments are typically: interest + 1% of balance (with $25 minimum)
+   * 3. Any amount above interest goes toward principal reduction
+   * 4. The process continues until the balance reaches zero
+   * 
+   * Educational Insights:
+   * - Shows how minimum payments keep you in debt for years
+   * - Demonstrates the power of paying even slightly more than the minimum
+   * - Illustrates how most of early payments go to interest, not principal
+   * - Reveals the true total cost of credit card debt
+   */
   useEffect(() => {
+    // Convert string inputs to numbers with fallbacks
     const currentBalance = parseFloat(balance) || 0
-    const annualRate = parseFloat(apr) / 100 || 0
-    const monthlyRate = annualRate / 12
+    const annualRate = parseFloat(apr) / 100 || 0      // Convert APR percentage to decimal
+    const monthlyRate = annualRate / 12                 // Convert annual rate to monthly rate
     const fixedPmt = parseFloat(fixedPayment) || 0
 
+    // Only calculate if we have valid inputs (positive balance and interest rate)
     if (currentBalance > 0 && annualRate > 0) {
       let remainingBalance = currentBalance
       let month = 0
       let totalInterestPaid = 0
       const schedule: PaymentDetail[] = []
-      const maxMonths = 600 // Prevent infinite loops
+      const maxMonths = 600 // Safety limit to prevent infinite loops (50 years)
 
+      // Simulate payments month by month until balance is paid off
       while (remainingBalance > 0.01 && month < maxMonths) {
         month++
+        
+        // Calculate interest charge for this month
+        // Interest = Remaining Balance × Monthly Interest Rate
         const interestPayment = remainingBalance * monthlyRate
         
+        // Calculate payment amount based on payment type
         let payment: number
         if (paymentType === 'minimum') {
-          payment = Math.max(interestPayment + remainingBalance * 0.01, 25) // Minimum payment
+          // Minimum payment = Interest + 1% of remaining balance, with $25 floor
+          // This is the standard credit card minimum payment formula
+          payment = Math.max(interestPayment + remainingBalance * 0.01, 25)
         } else {
+          // Use the user-specified fixed payment amount
           payment = fixedPmt
         }
 
-        // Ensure payment doesn't exceed remaining balance + interest
+        // Ensure payment doesn't exceed what's owed (balance + current interest)
+        // This prevents overpayment on the final payment
         payment = Math.min(payment, remainingBalance + interestPayment)
 
+        // Calculate how much of the payment goes to principal vs interest
+        // Principal payment = Total payment - Interest charge
         const principalPayment = payment - interestPayment
+        
+        // Update remaining balance by subtracting principal payment
+        // Use Math.max to ensure balance never goes negative
         remainingBalance = Math.max(0, remainingBalance - principalPayment)
+        
+        // Accumulate total interest paid over the life of the debt
         totalInterestPaid += interestPayment
 
+        // Record this month's payment details for schedule display
         schedule.push({
           month,
           payment,
           principal: principalPayment,
           interest: interestPayment,
           balance: remainingBalance,
-          year: Math.ceil(month / 12)
+          year: Math.ceil(month / 12)  // Calculate which year this payment falls in
         })
       }
 
+      // Update results with final calculations
       setResults({
         monthsToPayoff: month,
         totalInterest: totalInterestPaid,
-        totalPaid: currentBalance + totalInterestPaid,
+        totalPaid: currentBalance + totalInterestPaid,  // Original debt + all interest
         monthlyPayment: schedule.length > 0 ? schedule[0].payment : 0
       })
 
       setPaymentSchedule(schedule)
 
-      // Create chart data
+      // Create chart data by sampling the schedule for visualization
+      // We limit to ~24 data points to keep the chart readable
       const chartPoints = schedule.filter((_, index) => index % Math.max(1, Math.floor(schedule.length / 24)) === 0)
       setChartData(chartPoints.map(item => ({
         month: item.month,
-        principal: item.principal,
-        interest: item.interest
+        principal: item.principal,  // Blue area in chart
+        interest: item.interest     // Red area in chart
       })))
     } else {
+      // Reset results if inputs are invalid
       setResults({
         monthsToPayoff: 0,
         totalInterest: 0,
