@@ -259,17 +259,18 @@ export default function MortgageCalculator() {
               <CardHeader>
                 <CardTitle className="text-lg">Monthly Payment Breakdown</CardTitle>
               </CardHeader>
+              <CardContent>
                 <ScrollArea className="h-96 w-full">
                   <div className="pr-4">
-                        </TableRow>
                     <Table>
+                      <TableHeader className="sticky top-0 bg-background">
                         <TableRow>
                           <TableHead className="w-20">Payment #</TableHead>
                           <TableHead className="text-right">Payment</TableHead>
                           <TableHead className="text-right">Principal</TableHead>
                           <TableHead className="text-right">Interest</TableHead>
                           <TableHead className="text-right">Balance</TableHead>
-                            <TableCell className="text-right">{formatCurrency(payment.balance)}</TableCell>
+                        </TableRow>
                       </TableHeader>
                       <TableBody>
                         {monthlySchedule.map((payment) => (
@@ -278,7 +279,6 @@ export default function MortgageCalculator() {
                             <TableCell className="text-right">{formatCurrency(payment.payment)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(payment.principal)}</TableCell>
                             <TableCell className="text-right">{formatCurrency(payment.interest)}</TableCell>
-        </>
                             <TableCell className="text-right">{formatCurrency(payment.balance)}</TableCell>
                           </TableRow>
                         ))}
