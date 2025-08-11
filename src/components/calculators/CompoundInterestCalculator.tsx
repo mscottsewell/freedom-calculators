@@ -52,21 +52,27 @@ export default function CompoundInterestCalculator() {
     const depositFreqNum = parseInt(depositFreq) || 0
 
     if (P > 0 && r >= 0 && t > 0) {
+      // Calculate principal with compound interest
       let finalAmount = P * Math.pow(1 + r / n, n * t)
       let totalDeposits = P
       
+      // Calculate future value of additional deposits
       if (deposit > 0 && depositFreqNum > 0) {
         const totalPayments = depositFreqNum * t
-        if (depositFreqNum === 12) {
-          const monthlyRate = r / 12
-          const futureValueAnnuity = deposit * ((Math.pow(1 + monthlyRate, 12 * t) - 1) / monthlyRate)
-          finalAmount += futureValueAnnuity
-        } else if (depositFreqNum === 1) {
-          const annualRate = r
-          const futureValueAnnuity = deposit * ((Math.pow(1 + annualRate, t) - 1) / annualRate)
-          finalAmount += futureValueAnnuity
-        }
         totalDeposits += deposit * totalPayments
+        
+        // Calculate future value of each deposit based on when it's made
+        let depositsFutureValue = 0
+        
+        for (let period = 1; period <= totalPayments; period++) {
+          // Time remaining for this deposit to compound (in years)
+          const timeRemaining = t - (period / depositFreqNum)
+          // Future value of this single deposit
+          const thiDepositFV = deposit * Math.pow(1 + r / n, n * timeRemaining)
+          depositsFutureValue += thiDepositFV
+        }
+        
+        finalAmount += depositsFutureValue
       }
 
       const totalInterest = finalAmount - totalDeposits
@@ -79,26 +85,28 @@ export default function CompoundInterestCalculator() {
         totalReturnPercentage
       })
 
+      // Generate chart data
       const data = []
       for (let year = 0; year <= t; year++) {
-        let yearPrincipal = P * Math.pow(1 + r / n, n * year)
+        let yearAmount = P * Math.pow(1 + r / n, n * year)
         let yearDeposits = P
         
         if (deposit > 0 && depositFreqNum > 0 && year > 0) {
-          const paymentsThisYear = depositFreqNum * year
-          if (depositFreqNum === 12) {
-            const monthlyRate = r / 12
-            const futureValueAnnuity = deposit * ((Math.pow(1 + monthlyRate, 12 * year) - 1) / monthlyRate)
-            yearPrincipal += futureValueAnnuity
-          } else if (depositFreqNum === 1) {
-            const annualRate = r
-            const futureValueAnnuity = deposit * ((Math.pow(1 + annualRate, year) - 1) / annualRate)
-            yearPrincipal += futureValueAnnuity
-          }
+          const paymentsThisYear = Math.floor(depositFreqNum * year)
           yearDeposits += deposit * paymentsThisYear
+          
+          // Calculate future value of deposits made up to this year
+          let depositsFutureValue = 0
+          for (let period = 1; period <= paymentsThisYear; period++) {
+            const timeRemaining = year - (period / depositFreqNum)
+            const thisDepositFV = deposit * Math.pow(1 + r / n, n * timeRemaining)
+            depositsFutureValue += thisDepositFV
+          }
+          
+          yearAmount += depositsFutureValue
         }
         
-        const yearInterest = yearPrincipal - yearDeposits
+        const yearInterest = yearAmount - yearDeposits
         
         data.push({
           year,
