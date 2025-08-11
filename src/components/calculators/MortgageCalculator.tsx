@@ -303,6 +303,7 @@ export default function MortgageCalculator() {
               </p>
             </CardContent>
           </Card>
+        </>
       )}
     </div>
   )
