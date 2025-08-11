@@ -291,9 +291,11 @@ export default function MortgageCalculator() {
           </div>
 
           {/* Key Lesson Section */}
-          <Card className="mt-6">
+          <Card className="mt-6 border-accent">
             <CardHeader>
-              <CardTitle>Key Lesson</CardTitle>
+              <CardTitle className="text-accent flex items-center gap-2">
+                💡 Key Lesson
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-foreground">
