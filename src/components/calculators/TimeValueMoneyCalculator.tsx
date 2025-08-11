@@ -1,11 +1,19 @@
+// React imports
 import { useState, useEffect } from 'react'
+
+// Spark hooks for persistent data storage
 import { useKV } from '@github/spark/hooks'
+
+// UI component imports
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
+/**
+ * Formats a number as currency with proper thousands separators
+ */
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -15,6 +23,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
+/**
+ * Formats a number with proper thousands separators and decimal places
+ */
 const formatNumber = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
@@ -22,7 +33,10 @@ const formatNumber = (amount: number) => {
   }).format(amount)
 }
 
-// Newton-Raphson method for finding interest rate
+/**
+ * Newton-Raphson method for finding interest rate
+ * Advanced mathematical method for solving complex equations
+ */
 function calculateInterestRate(n: number, pv: number, pmt: number, fv: number): number {
   let rate = 0.1 // Initial guess
   const tolerance = 0.0000001

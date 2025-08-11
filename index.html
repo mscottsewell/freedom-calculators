@@ -1,18 +1,51 @@
 <!DOCTYPE html>
+<!-- 
+  Main HTML document for Mrs. Sewell's Financial FREEDom Calculators
+  
+  This single-page application provides six educational financial calculators
+  for use in Personal Financial Planning classes. The app uses Vite for 
+  development and builds, React for the UI framework, and Tailwind CSS for styling.
+  
+  Key Features:
+  - Responsive design that works on desktop, tablet, and mobile
+  - Professional typography using Inter font from Google Fonts
+  - Modern educational interface with interactive charts
+  - Persistent data storage for user inputs
+  
+  Technical Stack:
+  - React 18+ with TypeScript
+  - Vite build system
+  - Tailwind CSS for styling
+  - shadcn/ui component library
+  - Recharts for data visualization
+  - Phosphor Icons for interface icons
+-->
 <html lang="en">
 
 <head>
+    <!-- Character encoding and viewport settings for proper rendering -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Page title shown in browser tab -->
     <title>Mrs. Sewell's Financial FREEDom Calculators</title>
+    
+    <!-- Google Fonts preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Inter font family import - professional, readable typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Main CSS file containing Tailwind styles and theme variables -->
     <link href="/src/main.css" rel="stylesheet" />
 </head>
 
 <body>
+    <!-- Root element where the React application mounts -->
     <div id="root"></div>
+    
+    <!-- Main JavaScript module entry point -->
     <script type="module" src="/src/main.tsx"></script>
 </body>
 

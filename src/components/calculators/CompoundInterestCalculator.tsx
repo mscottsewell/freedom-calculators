@@ -1,11 +1,23 @@
+// React imports
 import { useState, useEffect } from 'react'
+
+// Spark hooks for persistent data storage
 import { useKV } from '@github/spark/hooks'
+
+// UI component imports
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+
+// Chart component imports from Recharts
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
+/**
+ * Formats a number as currency with proper thousands separators
+ * @param amount - The numeric amount to format
+ * @returns Formatted currency string (e.g., "$1,234.56")
+ */
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -15,18 +27,41 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
+// Available compounding frequency options
 const compoundingFrequencies = [
   { value: '1', label: 'Annually' },
   { value: '12', label: 'Monthly' }
 ]
 
+// Available deposit frequency options
 const depositFrequencies = [
   { value: '0', label: 'None' },
   { value: '12', label: 'Monthly' },
   { value: '1', label: 'Annual' }
 ]
 
+/**
+ * Compound Interest Calculator Component
+ * 
+ * Calculates investment growth using compound interest with optional additional deposits.
+ * Demonstrates the power of compound interest and regular investing over time.
+ * 
+ * Educational Purpose:
+ * - Shows how money grows exponentially through compound interest
+ * - Demonstrates the impact of regular additional deposits
+ * - Illustrates different compounding frequencies
+ * - Reinforces the importance of starting early and being consistent
+ * 
+ * Features:
+ * - Supports different compounding frequencies (annual, monthly)
+ * - Optional additional deposits (monthly or annual)
+ * - Real-time calculation updates
+ * - Visual chart showing principal vs interest growth
+ * - Detailed formula explanation and assumptions
+ * - Total return percentage calculation
+ */
 export default function CompoundInterestCalculator() {
+  // Persistent input states - survive page refreshes
   const [principal, setPrincipal] = useKV('compound-principal', '')
   const [interestRate, setInterestRate] = useKV('compound-rate', '')
   const [years, setYears] = useKV('compound-years', '')
@@ -34,34 +69,44 @@ export default function CompoundInterestCalculator() {
   const [additionalDeposit, setAdditionalDeposit] = useKV('compound-deposit', '')
   const [depositFreq, setDepositFreq] = useKV('compound-deposit-freq', '0')
 
+  // Temporary calculation results - recalculated on input changes
   const [results, setResults] = useState({
-    finalAmount: 0,
-    totalInterest: 0,
-    totalDeposits: 0,
-    totalReturnPercentage: 0
+    finalAmount: 0,           // Total final value
+    totalInterest: 0,         // Interest earned
+    totalDeposits: 0,         // Total money put in
+    totalReturnPercentage: 0  // Return as percentage
   })
 
+  // Chart data for growth visualization over time
   const [chartData, setChartData] = useState<Array<{year: number, principal: number, interest: number}>>([])
 
+  /**
+   * Effect to recalculate compound interest whenever inputs change
+   * Uses the compound interest formula: A = P(1 + r/n)^(nt)
+   * Plus additional calculations for regular deposits
+   */
   useEffect(() => {
-    const P = parseFloat(principal) || 0
-    const r = parseFloat(interestRate) / 100 || 0
-    const t = parseInt(years) || 0
-    const n = parseInt(compoundingFreq) || 12
-    const deposit = parseFloat(additionalDeposit) || 0
-    const depositFreqNum = parseInt(depositFreq) || 0
+    // Convert string inputs to numbers with fallbacks
+    const P = parseFloat(principal) || 0        // Principal amount
+    const r = parseFloat(interestRate) / 100 || 0  // Interest rate (decimal)
+    const t = parseInt(years) || 0              // Time in years
+    const n = parseInt(compoundingFreq) || 12   // Compounding frequency per year
+    const deposit = parseFloat(additionalDeposit) || 0  // Additional deposit amount
+    const depositFreqNum = parseInt(depositFreq) || 0   // Deposit frequency per year
 
+    // Only calculate if we have valid inputs
     if (P > 0 && r >= 0 && t > 0) {
-      // Calculate principal with compound interest
+      // Calculate principal with compound interest using: A = P(1 + r/n)^(nt)
       let finalAmount = P * Math.pow(1 + r / n, n * t)
-      let totalDeposits = P
+      let totalDeposits = P  // Start with initial principal
       
-      // Calculate future value of additional deposits
+      // Calculate future value of additional deposits if specified
       if (deposit > 0 && depositFreqNum > 0) {
-        const totalPayments = depositFreqNum * t
-        totalDeposits += deposit * totalPayments
+        const totalPayments = depositFreqNum * t  // Total number of deposits
+        totalDeposits += deposit * totalPayments  // Add all deposits to total
         
         // Calculate future value of each deposit based on when it's made
+        // Each deposit compounds for different periods depending on when made
         let depositsFutureValue = 0
         
         for (let period = 1; period <= totalPayments; period++) {
@@ -72,9 +117,11 @@ export default function CompoundInterestCalculator() {
           depositsFutureValue += thiDepositFV
         }
         
+        // Add the future value of all deposits to final amount
         finalAmount += depositsFutureValue
       }
 
+      // Calculate derived values
       const totalInterest = finalAmount - totalDeposits
       const totalReturnPercentage = totalDeposits > 0 ? ((finalAmount - totalDeposits) / totalDeposits) * 100 : 0
 
@@ -85,12 +132,14 @@ export default function CompoundInterestCalculator() {
         totalReturnPercentage
       })
 
-      // Generate chart data
+      // Generate chart data showing growth year by year
       const data = []
       for (let year = 0; year <= t; year++) {
+        // Calculate principal growth for this year
         let yearAmount = P * Math.pow(1 + r / n, n * year)
-        let yearDeposits = P
+        let yearDeposits = P  // Start with initial principal
         
+        // Add deposits made up to this year
         if (deposit > 0 && depositFreqNum > 0 && year > 0) {
           const paymentsThisYear = Math.floor(depositFreqNum * year)
           yearDeposits += deposit * paymentsThisYear
@@ -106,16 +155,18 @@ export default function CompoundInterestCalculator() {
           yearAmount += depositsFutureValue
         }
         
+        // Calculate interest portion for chart visualization
         const yearInterest = yearAmount - yearDeposits
         
         data.push({
           year,
-          principal: yearDeposits,
-          interest: yearInterest
+          principal: yearDeposits,    // Money put in (orange in chart)
+          interest: yearInterest      // Interest earned (green in chart)
         })
       }
       setChartData(data)
     } else {
+      // Reset results if inputs are invalid
       setResults({
         finalAmount: 0,
         totalInterest: 0,
@@ -126,6 +177,7 @@ export default function CompoundInterestCalculator() {
     }
   }, [principal, interestRate, years, compoundingFreq, additionalDeposit, depositFreq])
 
+  // Validation check for displaying results
   const hasValidInputs = parseFloat(principal) > 0 && parseFloat(interestRate) >= 0 && parseInt(years) > 0
 
   return (

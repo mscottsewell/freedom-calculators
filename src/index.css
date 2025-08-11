@@ -1,71 +1,138 @@
+/* Import Tailwind CSS utility classes */
 @import 'tailwindcss';
+
+/* Import additional animation utilities */
 @import "tw-animate-css";
 
+/* Base layer styles that apply to fundamental HTML elements */
 @layer base {
   * {
+    /* Apply consistent border styling across all elements */
     @apply border-border;
   }
 
   body {
+    /* Set Inter font family and apply theme colors */
     font-family: 'Inter', sans-serif;
     @apply bg-background text-foreground;
   }
 }
 
+/* 
+ * CSS Custom Properties (CSS Variables) for Theme Configuration
+ * These variables define the color palette and design tokens used throughout the app.
+ * Using oklch color space for more perceptually uniform colors.
+ */
 :root {
-  --background: oklch(0.98 0.01 240);
-  --foreground: oklch(0.25 0.15 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.15 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.15 240);
-  --primary: oklch(39.6% 0.141 25.723);
-  --primary-foreground: oklch(0.98 0.01 240);
-  --secondary: oklch(0.95 0.02 240);
-  --secondary-foreground: oklch(0.25 0.15 240);
-  --muted: oklch(0.95 0.02 240);
-  --muted-foreground: oklch(0.55 0.08 240);
-  --accent: oklch(75% 0.183 55.934);
-  --accent-foreground: oklch(0.98 0.01 240);
-  --destructive: oklch(0.6 0.2 15);
-  --destructive-foreground: oklch(0.98 0.01 240);
-  --border: oklch(0.9 0.03 240);
-  --input: oklch(0.9 0.03 240);
-  --ring: oklch(0.4 0.15 240);
-  --success: oklch(0.5 0.15 140);
-  --warning: oklch(0.65 0.15 45);
-  --info: oklch(0.55 0.15 200);
-  --radius: 0.75rem;
+  /* 
+   * Base colors that define the core visual identity
+   * These establish the foundational color scheme
+   */
+  --background: oklch(0.98 0.01 240);    /* Very light blue-gray for page background */
+  --foreground: oklch(0.25 0.15 240);    /* Dark blue-gray for main text */
+  
+  /* Card and popover background colors */
+  --card: oklch(1 0 0);                  /* Pure white for card backgrounds */
+  --card-foreground: oklch(0.25 0.15 240); /* Dark text on cards */
+  --popover: oklch(1 0 0);               /* Pure white for popovers */
+  --popover-foreground: oklch(0.25 0.15 240); /* Dark text on popovers */
+  
+  /*
+   * Action colors that represent interactive elements
+   * These colors guide user attention and indicate functionality
+   */
+  --primary: oklch(39.6% 0.141 25.723);    /* Deep blue for primary actions */
+  --primary-foreground: oklch(0.98 0.01 240); /* Light text on primary */
+  --secondary: oklch(0.95 0.02 240);        /* Light gray for secondary actions */
+  --secondary-foreground: oklch(0.25 0.15 240); /* Dark text on secondary */
+  
+  /* Muted colors for less prominent elements */
+  --muted: oklch(0.95 0.02 240);           /* Light gray background */
+  --muted-foreground: oklch(0.55 0.08 240); /* Medium gray text */
+  
+  /* Accent colors for highlighting and emphasis */
+  --accent: oklch(75% 0.183 55.934);       /* Bright yellow for accents */
+  --accent-foreground: oklch(0.98 0.01 240); /* Light text on accent */
+  
+  /* Destructive colors for warnings and dangerous actions */
+  --destructive: oklch(0.6 0.2 15);        /* Red for destructive actions */
+  --destructive-foreground: oklch(0.98 0.01 240); /* Light text on destructive */
+  
+  /*
+   * Supporting UI colors for various states and elements
+   */
+  --border: oklch(0.9 0.03 240);           /* Light border color */
+  --input: oklch(0.9 0.03 240);           /* Input field border color */
+  --ring: oklch(0.4 0.15 240);            /* Focus ring color */
+  
+  /* Additional semantic colors for financial data */
+  --success: oklch(0.5 0.15 140);         /* Green for positive values */
+  --warning: oklch(0.65 0.15 45);         /* Orange for warnings */
+  --info: oklch(0.55 0.15 200);           /* Blue for informational content */
+  
+  /*
+   * Border radius values for consistent shape language
+   * Defines how rounded corners appear throughout the interface
+   */
+  --radius: 0.75rem; /* Base radius - moderately rounded corners */
 }
 
+/*
+ * Theme mapping to Tailwind's utility classes
+ * These mappings allow us to use classes like bg-primary, text-foreground, etc.
+ * The @theme directive connects our CSS variables to Tailwind's color system
+ */
 @theme {
+  /* Map background and text colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  
+  /* Map card colors */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  
+  /* Map popover colors */
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  
+  /* Map primary action colors */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  
+  /* Map secondary action colors */
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  
+  /* Map muted colors */
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  
+  /* Map accent colors */
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  
+  /* Map destructive colors */
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  
+  /* Map interface element colors */
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  
+  /* Map semantic colors */
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
 
-  --radius-sm: calc(var(--radius) * 0.5);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) * 1.5);
-  --radius-xl: calc(var(--radius) * 2);
-  --radius-2xl: calc(var(--radius) * 3);
-  --radius-full: 9999px;
+  /* 
+   * Create a radius scale for consistent corner rounding
+   * Based on the base radius variable with mathematical relationships
+   */
+  --radius-sm: calc(var(--radius) * 0.5);   /* Small radius: ~6px */
+  --radius-md: var(--radius);               /* Medium radius: 12px */
+  --radius-lg: calc(var(--radius) * 1.5);   /* Large radius: ~18px */
+  --radius-xl: calc(var(--radius) * 2);     /* Extra large radius: 24px */
+  --radius-2xl: calc(var(--radius) * 3);    /* 2X large radius: ~36px */
+  --radius-full: 9999px;                    /* Full radius: perfect circles */
 }

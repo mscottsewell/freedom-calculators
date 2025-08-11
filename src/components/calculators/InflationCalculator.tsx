@@ -1,11 +1,23 @@
+// React imports
 import { useState, useEffect } from 'react'
+
+// Spark hooks for persistent data storage
 import { useKV } from '@github/spark/hooks'
+
+// UI component imports
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+
+// Chart component imports from Recharts
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
+/**
+ * Formats a number as currency with proper thousands separators
+ * @param amount - The numeric amount to format
+ * @returns Formatted currency string (e.g., "$1,234.56")
+ */
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -15,6 +27,11 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
+/**
+ * Formats a number with proper thousands separators and decimal places
+ * @param amount - The numeric amount to format
+ * @returns Formatted number string (e.g., "1,234.56")
+ */
 const formatNumber = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
@@ -22,28 +39,60 @@ const formatNumber = (amount: number) => {
   }).format(amount)
 }
 
+/**
+ * Inflation Calculator Component
+ * 
+ * Calculates how inflation affects purchasing power over time and displays
+ * the results with an interactive chart visualization.
+ * 
+ * Educational Purpose:
+ * - Demonstrates the real impact of inflation on money's value
+ * - Shows why keeping money in low-yield accounts loses purchasing power
+ * - Helps students understand why investments must beat inflation
+ * 
+ * Features:
+ * - Persistent input storage using useKV
+ * - Real-time calculation updates
+ * - Visual chart showing purchasing power decline
+ * - Detailed explanation of results
+ * - Key lesson reinforcement
+ */
 export default function InflationCalculator() {
+  // Persistent input states - survive page refreshes
   const [currentAmount, setCurrentAmount] = useKV('inflation-current-amount', '')
   const [inflationRate, setInflationRate] = useKV('inflation-rate', '')
   const [years, setYears] = useKV('inflation-years', '')
   
+  // Temporary calculation results - recalculated on input changes
   const [results, setResults] = useState({
-    futureValue: 0,
-    realValue: 0,
-    purchasingPowerLost: 0,
-    percentageLost: 0
+    futureValue: 0,      // What the amount would be worth nominally
+    realValue: 0,        // What it can actually buy (purchasing power)
+    purchasingPowerLost: 0,  // Amount of purchasing power lost
+    percentageLost: 0    // Percentage of purchasing power lost
   })
 
+  // Chart data for purchasing power visualization over time
   const [chartData, setChartData] = useState<Array<{year: number, purchasingPower: number, originalValue: number}>>([])
 
+  /**
+   * Effect to recalculate inflation impact whenever inputs change
+   * Uses the compound inflation formula: Real Value = Amount / (1 + rate)^years
+   */
   useEffect(() => {
+    // Convert string inputs to numbers with fallbacks
     const amount = parseFloat(currentAmount) || 0
-    const rate = parseFloat(inflationRate) / 100 || 0
+    const rate = parseFloat(inflationRate) / 100 || 0  // Convert percentage to decimal
     const numYears = parseInt(years) || 0
 
+    // Only calculate if we have valid positive inputs
     if (amount > 0 && rate >= 0 && numYears > 0) {
+      // Calculate future nominal value (what the number will be)
       const futureValue = amount * Math.pow(1 + rate, numYears)
+      
+      // Calculate real purchasing power value (what it can actually buy)
       const realValue = amount / Math.pow(1 + rate, numYears)
+      
+      // Calculate the loss in purchasing power
       const purchasingPowerLost = amount - realValue
       const percentageLost = (purchasingPowerLost / amount) * 100
 
@@ -54,17 +103,19 @@ export default function InflationCalculator() {
         percentageLost
       })
 
+      // Generate chart data showing purchasing power decline year by year
       const data = []
       for (let year = 0; year <= numYears; year++) {
         const purchasingPower = amount / Math.pow(1 + rate, year)
         data.push({
           year,
           purchasingPower,
-          originalValue: amount
+          originalValue: amount  // Reference line for comparison
         })
       }
       setChartData(data)
     } else {
+      // Reset results if inputs are invalid
       setResults({
         futureValue: 0,
         realValue: 0,
@@ -75,11 +126,14 @@ export default function InflationCalculator() {
     }
   }, [currentAmount, inflationRate, years])
 
+  // Validation check for displaying results
   const hasValidInputs = parseFloat(currentAmount) > 0 && parseFloat(inflationRate) >= 0 && parseInt(years) > 0
 
   return (
     <div className="space-y-6">
+      {/* Input Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Current Amount Input */}
         <div className="space-y-2">
           <Label htmlFor="current-amount">Current Amount ($)</Label>
           <Input
@@ -90,6 +144,8 @@ export default function InflationCalculator() {
             placeholder="10000"
           />
         </div>
+        
+        {/* Inflation Rate Input */}
         <div className="space-y-2">
           <Label htmlFor="inflation-rate">Inflation Rate (%)</Label>
           <Input
@@ -101,6 +157,8 @@ export default function InflationCalculator() {
             placeholder="3.0"
           />
         </div>
+        
+        {/* Years Input */}
         <div className="space-y-2">
           <Label htmlFor="years">Number of Years</Label>
           <Input
@@ -113,26 +171,36 @@ export default function InflationCalculator() {
         </div>
       </div>
 
+      {/* Results Section - Only show if inputs are valid */}
       {hasValidInputs && (
         <>
+          {/* Results Display and Chart */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Numerical Results Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Impact of Inflation</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Future nominal value - what the number will be */}
                 <div className="flex justify-between">
                   <span>Future nominal value:</span>
                   <span className="font-semibold text-primary">{formatCurrency(results.futureValue)}</span>
                 </div>
+                
+                {/* Real purchasing power - what it can actually buy */}
                 <div className="flex justify-between">
                   <span>Real purchasing power:</span>
                   <span className="font-semibold text-success">{formatCurrency(results.realValue)}</span>
                 </div>
+                
+                {/* Purchasing power lost - absolute amount */}
                 <div className="flex justify-between">
                   <span>Purchasing power lost:</span>
                   <span className="font-semibold text-destructive">{formatCurrency(results.purchasingPowerLost)}</span>
                 </div>
+                
+                {/* Percentage lost - relative impact */}
                 <div className="flex justify-between">
                   <span>Percentage lost:</span>
                   <span className="font-semibold text-destructive">{formatNumber(results.percentageLost)}%</span>
@@ -140,6 +208,7 @@ export default function InflationCalculator() {
               </CardContent>
             </Card>
 
+            {/* Purchasing Power Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="text-lg">Purchasing Power Over Time</CardTitle>
@@ -147,13 +216,22 @@ export default function InflationCalculator() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={chartData}>
+                    {/* Grid lines for readability */}
                     <CartesianGrid strokeDasharray="3 3" />
+                    
+                    {/* X-axis showing years */}
                     <XAxis dataKey="year" />
+                    
+                    {/* Y-axis showing dollar amounts in thousands */}
                     <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                    
+                    {/* Tooltip showing detailed values on hover */}
                     <Tooltip 
                       formatter={(value: number) => [formatCurrency(value), 'Purchasing Power']}
                       labelFormatter={(label) => `Year ${label}`}
                     />
+                    
+                    {/* Area chart showing purchasing power decline (red color) */}
                     <Area 
                       type="monotone" 
                       dataKey="purchasingPower" 
@@ -167,6 +245,7 @@ export default function InflationCalculator() {
             </Card>
           </div>
 
+          {/* Explanation Alert */}
           <Alert>
             <AlertDescription>
               <strong>What This Means:</strong> With inflation at {inflationRate}% per year, your {formatCurrency(parseFloat(currentAmount))} today
@@ -176,6 +255,7 @@ export default function InflationCalculator() {
             </AlertDescription>
           </Alert>
 
+          {/* Key Lesson Card for Educational Reinforcement */}
           <Card className="border-accent">
             <CardHeader>
               <CardTitle className="text-accent flex items-center gap-2">

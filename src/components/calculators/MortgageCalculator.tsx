@@ -1,11 +1,20 @@
+// React imports
 import { useState, useEffect } from 'react'
+
+// Spark hooks for persistent data storage
 import { useKV } from '@github/spark/hooks'
+
+// UI component imports
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
+/**
+ * Formats a number as currency with proper thousands separators
+ * Used throughout the mortgage calculator for displaying dollar amounts
+ */
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -15,24 +24,61 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
+/**
+ * Interface for yearly mortgage amortization data
+ * Tracks the key financial metrics for each year of the loan
+ */
 interface YearlyData {
-  year: number
-  beginningBalance: number
-  totalPayments: number
-  principalPaid: number
-  interestPaid: number
-  endingBalance: number
+  year: number               // Year number (1, 2, 3, etc.)
+  beginningBalance: number   // Loan balance at start of year
+  totalPayments: number      // Total payments made this year
+  principalPaid: number      // Principal paid down this year
+  interestPaid: number       // Interest paid this year
+  endingBalance: number      // Loan balance at end of year
 }
 
+/**
+ * Interface for individual monthly payment details
+ * Provides granular view of each mortgage payment
+ */
 interface PaymentDetail {
-  month: number
-  payment: number
-  principal: number
-  interest: number
-  balance: number
+  month: number    // Payment number (1-360 for 30-year loan)
+  payment: number  // Monthly payment amount
+  principal: number // Principal portion of payment
+  interest: number  // Interest portion of payment
+  balance: number   // Remaining balance after payment
 }
 
+/**
+ * Mortgage Calculator Component
+ * 
+ * Calculates mortgage payments and generates complete amortization schedules.
+ * Helps students understand how mortgages work and the long-term cost of borrowing.
+ * 
+ * Educational Purpose:
+ * - Demonstrates the structure of mortgage payments (principal vs interest)
+ * - Shows how payments are allocated over the life of the loan
+ * - Illustrates the impact of down payments on loan amounts
+ * - Teaches the concept of building equity over time
+ * - Reinforces the importance of understanding total loan costs
+ * 
+ * Features:
+ * - Home price and down payment percentage inputs
+ * - Automatic loan amount calculation
+ * - Monthly payment calculation using standard mortgage formula
+ * - Complete yearly amortization schedule
+ * - Detailed monthly payment breakdown
+ * - Equity calculation showing wealth building
+ * - Sticky table headers for easy data viewing
+ * 
+ * Key Financial Concepts:
+ * - Loan-to-value ratio (LTV) through down payment percentage
+ * - Amortization and how payment allocation changes over time
+ * - Equity building through principal payments and appreciation
+ * - Total cost of borrowing including all interest payments
+ */
 export default function MortgageCalculator() {
+  // Persistent input states - survive page refreshes
   const [homePrice, setHomePrice] = useKV('mortgage-home-price', '')
   const [downPaymentPercent, setDownPaymentPercent] = useKV('mortgage-down-payment-percent', '10')
   const [interestRate, setInterestRate] = useKV('mortgage-interest-rate', '')
