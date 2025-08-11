@@ -224,10 +224,10 @@ export default function MortgageCalculator() {
                 <CardTitle className="text-lg">Yearly Amortization Schedule</CardTitle>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-96 w-full">
+                <ScrollArea className="h-[500px] w-full">
                   <div className="pr-4">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="sticky top-0 bg-muted">
                         <TableRow>
                           <TableHead className="w-16">Year</TableHead>
                           <TableHead className="text-right">Payments</TableHead>
@@ -260,10 +260,10 @@ export default function MortgageCalculator() {
                 <CardTitle className="text-lg">Monthly Payment Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-96 w-full">
+                <ScrollArea className="h-[500px] w-full">
                   <div className="pr-4">
                     <Table>
-                      <TableHeader className="sticky top-0 bg-background">
+                      <TableHeader className="sticky top-0 bg-muted">
                         <TableRow>
                           <TableHead className="w-20">Payment #</TableHead>
                           <TableHead className="text-right">Payment</TableHead>
