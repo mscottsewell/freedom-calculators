@@ -115,7 +115,7 @@ export default function InflationCalculator() {
 
       {hasValidInputs && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Impact of Inflation</CardTitle>
@@ -140,7 +140,7 @@ export default function InflationCalculator() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="text-lg">Purchasing Power Over Time</CardTitle>
               </CardHeader>
