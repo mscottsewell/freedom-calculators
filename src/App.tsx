@@ -113,7 +113,7 @@ function App() {
                   className="flex flex-col items-center gap-3 p-4 text-sm font-semibold"
                 >
                   {/* Calculator icon - larger and more prominent */}
-                  <IconComponent size={32} />
+                  <IconComponent size={40} />
                   {/* Calculator name - bold and larger text */}
                   <span className="text-center leading-tight font-bold">{calc.title}</span>
                 </TabsTrigger>
