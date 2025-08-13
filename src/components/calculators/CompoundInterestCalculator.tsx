@@ -268,160 +268,82 @@ export default function CompoundInterestCalculator() {
       </div>
 
       {hasValidInputs && (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Results</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">Final Amount</div>
-                  <div className="text-2xl font-bold text-primary">{formatCurrency(results.finalAmount)}</div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">Total Interest Earned</div>
-                  <div className="text-xl font-semibold text-success">{formatCurrency(results.totalInterest)}</div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">Total Deposits</div>
-                  <div className="text-xl font-semibold text-warning">{formatCurrency(results.totalDeposits)}</div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">Total Return</div>
-                  <div className="text-xl font-semibold text-info">{results.totalReturnPercentage.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg">Growth Over Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="year" />
-                    <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
-                    <Tooltip 
-                      formatter={(value: number, name: string) => [
-                        formatCurrency(value), 
-                        name === 'principal' ? 'Principal: ' : 'Interest: '
-                      ]}
-                      labelFormatter={(label) => `Year ${label}`}
-                    />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="principal" 
-                      stackId="1"
-                      stroke="oklch(0.65 0.15 45)" 
-                      fill="oklch(0.65 0.15 45)"
-                      name="Principal"
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="interest" 
-                      stackId="1"
-                      stroke="oklch(0.5 0.15 140)" 
-                      fill="oklch(0.5 0.15 140)"
-                      name="Interest"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            <Card className="border-info">
-              <CardHeader>
-                <CardTitle className="text-info flex items-center gap-2">
-                  📐 Formula Used
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Compound Interest Formula:</h4>
-                  <div className="bg-muted p-3 rounded-lg font-mono text-sm">
-                    A = P(1 + r/n)^(nt)
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-2 space-y-1">
-                    <div><strong>A</strong> = Final amount</div>
-                    <div><strong>P</strong> = Principal (initial investment)</div>
-                    <div><strong>r</strong> = Annual interest rate (decimal)</div>
-                    <div><strong>n</strong> = Compounding frequency per year</div>
-                    <div><strong>t</strong> = Time in years</div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-2">Additional Deposits Formula:</h4>
-                  <div className="bg-muted p-3 rounded-lg font-mono text-sm">
-                    FV = PMT × ((1 + r/n)^(nt) - 1) / (r/n)
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-2 space-y-1">
-                    <div><strong>FV</strong> = Future value of deposits</div>
-                    <div><strong>PMT</strong> = Regular deposit amount</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-warning">
-              <CardHeader>
-                <CardTitle className="text-warning flex items-center gap-2">
-                  ⚠️ Key Assumptions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>Interest rate remains constant throughout the investment period</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>Additional deposits are made at the end of each period</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>No withdrawals are made during the investment period</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>All interest is reinvested (compounded) automatically</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>No taxes or fees are considered in the calculation</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-warning mt-0.5">•</span>
-                    <span>Market volatility and inflation are not factored in</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="border-accent mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-accent flex items-center gap-2">
-                💡 Key Lesson
-              </CardTitle>
+              <CardTitle className="text-lg">Results</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-foreground">
-                <strong>Compound interest is the eighth wonder of the world.</strong> The earlier you start investing, the more time your money has to grow exponentially. 
-                Even small amounts invested regularly can become substantial wealth over time due to compounding. The key is starting early and being consistent - 
-                time in the market is more powerful than timing the market. A 25-year-old who saves $200/month will have significantly more at retirement than 
-                a 35-year-old who saves $400/month, simply because of those extra 10 years of compound growth.
-              </p>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Final Amount</div>
+                <div className="text-2xl font-bold text-primary">{formatCurrency(results.finalAmount)}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Total Interest Earned</div>
+                <div className="text-xl font-semibold text-success">{formatCurrency(results.totalInterest)}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Total Deposits</div>
+                <div className="text-xl font-semibold text-warning">{formatCurrency(results.totalDeposits)}</div>
+              </div>
             </CardContent>
           </Card>
-        </>
+
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-lg">Growth Over Time</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [
+                      formatCurrency(value), 
+                      name === 'principal' ? 'Principal' : 'Interest'
+                    ]}
+                    labelFormatter={(label) => `Year ${label}`}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="principal" 
+                    stackId="1"
+                    stroke="oklch(0.65 0.15 45)" 
+                    fill="oklch(0.65 0.15 45)"
+                    name="Principal"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="interest" 
+                    stackId="1"
+                    stroke="oklch(0.5 0.15 140)" 
+                    fill="oklch(0.5 0.15 140)"
+                    name="Interest"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="border-accent">
+          <CardHeader>
+            <CardTitle className="text-accent flex items-center gap-2">
+              💡 Key Lesson
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground">
+              <strong>Compound interest is the eighth wonder of the world.</strong> The earlier you start investing, the more time your money has to grow exponentially. 
+              Even small amounts invested regularly can become substantial wealth over time due to compounding. The key is starting early and being consistent - 
+              time in the market is more powerful than timing the market. A 25-year-old who saves $200/month will have significantly more at retirement than 
+              a 35-year-old who saves $400/month, simply because of those extra 10 years of compound growth.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

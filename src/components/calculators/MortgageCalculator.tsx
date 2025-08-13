@@ -384,22 +384,21 @@ export default function MortgageCalculator() {
             </Card>
           </div>
 
-          {/* Key Lesson Section */}
-          <Card className="mt-6 border-accent">
-            <CardHeader>
-              <CardTitle className="text-accent flex items-center gap-2">
-                💡 Key Lesson
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-foreground">
-                <strong>Your home can be your largest investment or your biggest financial mistake.</strong> A mortgage allows you to leverage borrowed money to potentially build wealth through real estate appreciation. 
-                However, the total interest paid over 30 years often equals or exceeds the original loan amount. Making extra principal payments early in the loan dramatically reduces total interest costs. 
-                Remember that a home isn't just an investment - it provides shelter and stability. Buy what you can afford, not what the bank will lend you.
-              </p>
-            </CardContent>
-          </Card>
-        </>
+      {hasValidInputs && (
+        <Card className="border-accent">
+          <CardHeader>
+            <CardTitle className="text-accent flex items-center gap-2">
+              💡 Key Lesson
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-foreground">
+              <strong>Your home can be your largest investment or your biggest financial mistake.</strong> A mortgage allows you to leverage borrowed money to potentially build wealth through real estate appreciation. 
+              However, the total interest paid over 30 years often equals or exceeds the original loan amount. Making extra principal payments early in the loan dramatically reduces total interest costs. 
+              Remember that a home isn't just an investment - it provides shelter and stability. Buy what you can afford, not what the bank will lend you.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
